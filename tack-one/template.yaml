@@ -1,0 +1,48 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: >
+  task-one
+
+  Sample SAM Template for task-one
+
+Globals:
+  Function:
+    Timeout: 3
+    MemorySize: 128
+
+    Tracing: Active
+  Api:
+    TracingEnabled: true
+Resources:
+  MoviesBucket:
+    Type: AWS::S3::Bucket
+  AppFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lib/
+      Handler: app.lambda_handler
+      Runtime: ruby3.2
+      Architectures:
+      - arm64
+      FunctionUrlConfig:
+        AuthType: NONE
+      Environment:
+        Variables:
+          # ENV_VAR_NAME: '{{resolve:secretsmanager:<Secret name>:SecretString:<Secret key>}}'
+          THEMOVIEDB_API_KEY: '{{resolve:secretsmanager:task1:SecretString:api_key}}'
+          MOVIES_BUCKET: !Ref MoviesBucket
+      Policies:
+        - Version: "2012-10-17"
+          Statement:
+            - Effect: Allow
+              Action:
+                - s3:PutObject
+                - s3:GetObject
+              Resource: !Sub
+                - ${BucketArn}/*
+                - { BucketArn: !GetAtt MoviesBucket.Arn }
+
+Outputs:
+  AppURL:
+    Description: "Application endpoint"
+    Value: !GetAtt AppFunctionUrl.FunctionUrl
