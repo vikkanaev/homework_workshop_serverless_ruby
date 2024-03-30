@@ -1,0 +1,56 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Description: TaskThree
+
+Parameters:
+
+  RailsEnv:
+    Type: String
+    Default: staging
+    AllowedValues:
+      - staging
+      - production
+
+Globals:
+
+  Function:
+    Architectures:
+      - arm64
+    AutoPublishAlias: live
+    DeploymentPreference:
+      Type: AllAtOnce
+    Environment:
+      Variables:
+        RAILS_ENV: !Ref RailsEnv
+        MYSQL_HOST: "mysql"
+    Timeout: 30
+    VpcConfig:
+      SubnetIds:
+        - subnet-0123505acfcb38226
+        - subnet-0dc88265afda6b6b4
+        - subnet-08c818f9b84100e2f
+        - subnet-0bdd77cbad5a57ddf
+      SecurityGroupIds:
+        - sg-0224176f5f5b1cc46
+
+Resources:
+
+  RailsLambda:
+    Type: AWS::Serverless::Function
+    Metadata:
+      DockerContext: .
+      Dockerfile: Dockerfile
+      DockerTag: web
+    Properties:
+      Policies:
+        - AWSLambdaVPCAccessExecutionRole
+      FunctionUrlConfig:
+        AuthType: NONE
+      MemorySize: 1792
+      PackageType: Image
+
+Outputs:
+
+  RailsLambdaUrl:
+    Description: Lambda Function URL
+    Value: !GetAtt RailsLambdaUrl.FunctionUrl
