@@ -16,6 +16,5 @@ test:
 
 production:
   <<: *default
-  password: qDjrEHQ7gT324XIUC8lNoHUz4Jr
-  host: database-1.cp08wuk86x8j.us-east-1.rds.amazonaws.com
+  password: <%= ENV.fetch("MYSQL_PASS") { "" } %>
   database: task-three-production

@@ -48,6 +48,11 @@ Resources:
         AuthType: NONE
       MemorySize: 1792
       PackageType: Image
+      Environment:
+        Variables:
+          # ENV_VAR_NAME: '{{resolve:secretsmanager:<Secret name>:SecretString:<Secret key>}}'
+          MYSQL_HOST: '{{resolve:secretsmanager:db_creds:SecretString:db_host}}'
+          MYSQL_PASS: '{{resolve:secretsmanager:db_creds:SecretString:db_pass}}'
 
 Outputs:
 
